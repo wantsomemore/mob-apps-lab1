@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/data.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key, required this.title});
@@ -11,10 +12,23 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   String userName = '';
+  late List<String> groups;
+  String? selectedGroup;
+
+  _LoginState() {
+    ScheduleData scheduleData = ScheduleData();
+    groups = scheduleData.getGroupsNames();
+  }
 
   void handleUserForm(value) {
     setState(() {
       userName = value;
+    });
+  }
+
+  void handleDropdown(String? value) {
+    setState(() {
+      selectedGroup = value;
     });
   }
 
@@ -28,6 +42,26 @@ class _LoginState extends State<Login> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(10),
+                child: const Text('Choose group name')),
+            Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(10),
+                child: DropdownButton(
+                  items: groups
+                      .map((group) => DropdownMenuItem(
+                            value: group,
+                            child: Text(group),
+                          ))
+                      .toList(),
+                  value: selectedGroup,
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  onChanged: (value) {
+                    handleDropdown(value);
+                  },
+                )),
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(10),
@@ -45,8 +79,10 @@ class _LoginState extends State<Login> {
               color: Colors.black,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/dashboard',
-                      arguments: {"userName": userName});
+                  Navigator.pushNamed(context, '/dashboard', arguments: {
+                    "userName": userName,
+                    "selectedGroup": selectedGroup
+                  });
                 },
                 child: const Text('Submit'),
               ),
